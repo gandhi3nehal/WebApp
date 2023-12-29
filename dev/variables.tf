@@ -10,8 +10,10 @@ variable "dev_prefix" {
 
 variable "db_read_capacity" {
   type = number
+  db_read_capacity = 1
 }
 
 variable "db_write_capacity" {
   type = number
+  db_write_capacity = 1
 }
