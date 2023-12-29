@@ -2,7 +2,7 @@ provider "aws" {
   region = var.region
   default_tags {
     tags = {
-      Environment = "${var.prod_prefix}"
+      Environment = "${var.env_prefix}"
       Service     = "webapp"
     }
   }
@@ -14,7 +14,7 @@ resource "random_pet" "petname" {
 }
 
 resource "aws_s3_bucket" "prod" {
-  bucket = "${var.prod_prefix}-${random_pet.petname.id}"
+  bucket = "${var.env_prefix}-${random_pet.petname.id}"
 
   force_destroy = true
 }
@@ -96,7 +96,7 @@ resource "aws_s3_object" "prod" {
 resource "random_pet" "table_name" {}
 
 resource "aws_dynamodb_table" "table" {
-  name = "${var.prod_prefix}-${random_pet.table_name.id}"
+  name = "${var.env_prefix}-${random_pet.table_name.id}"
 
   read_capacity  = var.db_read_capacity
   write_capacity = var.db_write_capacity
@@ -108,13 +108,32 @@ resource "aws_dynamodb_table" "table" {
   }
 }
 
+resource "aws_iam_role" "webapp_role" {
+  name = "${var.env_prefix}-webapp-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role_policy_attachment" "webapp_attachment" {
   role       = aws_iam_role.webapp_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
 resource "aws_iam_instance_profile" "webapp_profile" {
-  name = "${var.prod_prefix}-webapp-profile"
+  name = "${var.env_prefix}-webapp-profile"
   role = aws_iam_role.webapp_role.name
 }
 
@@ -125,7 +144,7 @@ resource "aws_instance" "webapp_instance" {
   iam_instance_profile = aws_iam_instance_profile.webapp_profile.name
 
   tags = {
-    Name = "${var.prod_prefix}-webapp-instance"
+    Name = "${var.env_prefix}-webapp-instance"
   }
 }
 
