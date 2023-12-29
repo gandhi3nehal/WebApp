@@ -13,14 +13,14 @@ resource "random_pet" "petname" {
   separator = "-"
 }
 
-resource "aws_s3_bucket" "prod" {
+resource "aws_s3_bucket" "webapp_bucket" {
   bucket = "${var.env_prefix}-${random_pet.petname.id}"
 
   force_destroy = true
 }
 
-resource "aws_s3_bucket_website_configuration" "prod" {
-  bucket = aws_s3_bucket.prod.id
+resource "aws_s3_bucket_website_configuration" "webapp_bucket" {
+  bucket = aws_s3_bucket.webapp_bucket.id
 
   index_document {
     suffix = "index.html"
@@ -31,16 +31,16 @@ resource "aws_s3_bucket_website_configuration" "prod" {
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "prod" {
-  bucket = aws_s3_bucket.prod.id
+resource "aws_s3_bucket_ownership_controls" "webapp_bucket" {
+  bucket = aws_s3_bucket.webapp_bucket.id
 
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "prod" {
-  bucket = aws_s3_bucket.prod.id
+resource "aws_s3_bucket_public_access_block" "webapp_bucket" {
+  bucket = aws_s3_bucket.webapp_bucket.id
 
   block_public_acls       = false
   block_public_policy     = false
@@ -48,24 +48,23 @@ resource "aws_s3_bucket_public_access_block" "prod" {
   restrict_public_buckets = false
 }
 
-
-resource "aws_s3_bucket_acl" "prod" {
+resource "aws_s3_bucket_acl" "webapp_bucket" {
   depends_on = [
-    aws_s3_bucket_ownership_controls.prod,
-    aws_s3_bucket_public_access_block.prod,
+    aws_s3_bucket_ownership_controls.webapp_bucket,
+    aws_s3_bucket_public_access_block.webapp_bucket,
   ]
 
-  bucket = aws_s3_bucket.prod.id
+  bucket = aws_s3_bucket.webapp_bucket.id
 
   acl = "public-read"
 }
 
-resource "aws_s3_bucket_policy" "prod" {
+resource "aws_s3_bucket_policy" "webapp_bucket" {
   depends_on = [
-    aws_s3_bucket_acl.prod
+    aws_s3_bucket_acl.webapp_bucket
   ]
 
-  bucket = aws_s3_bucket.prod.id
+  bucket = aws_s3_bucket.webapp_bucket.id
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -78,7 +77,7 @@ resource "aws_s3_bucket_policy" "prod" {
                 "s3:GetObject"
             ],
             "Resource": [
-                "arn:aws:s3:::${aws_s3_bucket.prod.id}/*"
+                "arn:aws:s3:::${aws_s3_bucket.webapp_bucket.id}/*"
             ]
         }
     ]
@@ -86,9 +85,9 @@ resource "aws_s3_bucket_policy" "prod" {
 EOF
 }
 
-resource "aws_s3_object" "prod" {
+resource "aws_s3_object" "webapp_bucket" {
   key          = "index.html"
-  bucket       = aws_s3_bucket.prod.id
+  bucket       = aws_s3_bucket.webapp_bucket.id
   content      = file("../assets/index.html")
   content_type = "text/html"
 }
@@ -139,7 +138,7 @@ resource "aws_iam_instance_profile" "webapp_profile" {
 
 resource "aws_instance" "webapp_instance" {
   ami           = "ami-06ca3ca175f37dd66"
-  instance_type = "t2.micro"
+  instance_type = "t2.large"
   
   iam_instance_profile = aws_iam_instance_profile.webapp_profile.name
 
@@ -149,7 +148,7 @@ resource "aws_instance" "webapp_instance" {
 }
 
 resource "aws_s3_bucket_policy" "webapp_bucket_policy" {
-  bucket = aws_s3_bucket.prod.id
+  bucket = aws_s3_bucket.webapp_bucket.id
 
   policy = jsonencode({
     "Version": "2012-10-17",
@@ -164,8 +163,8 @@ resource "aws_s3_bucket_policy" "webapp_bucket_policy" {
           "s3:ListBucket"
         ],
         "Resource": [
-          "arn:aws:s3:::${aws_s3_bucket.prod.id}",
-          "arn:aws:s3:::${aws_s3_bucket.prod.id}/*"
+          "arn:aws:s3:::${aws_s3_bucket.webapp_bucket.id}",
+          "arn:aws:s3:::${aws_s3_bucket.webapp_bucket.id}/*"
         ]
       }
     ]
