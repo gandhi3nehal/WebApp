@@ -10,10 +10,10 @@ variable "env_prefix" {
 
 variable "db_read_capacity" {
   type = number
-  default = 1
+  default = 2
 }
 
 variable "db_write_capacity" {
   type = number
-  default = 1
+  default = 2
 }
