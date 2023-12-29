@@ -1,5 +1,11 @@
 provider "aws" {
   region = var.region
+  default_tags {
+    tags = {
+      Environment = "${var.prod_prefix}"
+      Service     = "webapp"
+    }
+  }
 }
 
 resource "random_pet" "petname" {
