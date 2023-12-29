@@ -89,7 +89,7 @@ EOF
 resource "aws_s3_object" "prod" {
   key          = "index.html"
   bucket       = aws_s3_bucket.prod.id
-  content      = file("${path.module}/assets/index.html")
+  content      = file("../assets/index.html")
   content_type = "text/html"
 }
 
