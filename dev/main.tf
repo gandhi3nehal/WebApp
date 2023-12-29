@@ -2,7 +2,7 @@ provider "aws" {
   region = var.region
   default_tags {
     tags = {
-      Environment = "dev"
+      Environment = "${var.dev_prefix}"
       Service     = "webapp"
     }
   }
