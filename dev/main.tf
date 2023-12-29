@@ -143,7 +143,7 @@ resource "aws_instance" "webapp_instance" {
   iam_instance_profile = aws_iam_instance_profile.webapp_profile.name
 
   tags = {
-    Name = "webapp-instance"
+    Name = "${var.dev_prefix}-webapp-instance"
   }
 }
 
