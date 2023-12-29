@@ -8,4 +8,10 @@ variable "dev_prefix" {
   dev_prefix  = "dev"
 }
 
+variable "db_read_capacity" {
+  type = number
+}
 
+variable "db_write_capacity" {
+  type = number
+}
