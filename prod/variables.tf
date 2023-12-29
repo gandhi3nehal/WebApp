@@ -8,3 +8,10 @@ variable "prod_prefix" {
   prod_prefix = "prod"
 }
 
+variable "db_read_capacity" {
+  type = number
+}
+
+variable "db_write_capacity" {
+  type = number
+}
