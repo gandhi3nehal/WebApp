@@ -148,7 +148,7 @@ resource "aws_instance" "webapp_instance" {
 }
 
 resource "aws_s3_bucket_policy" "webapp_bucket_policy" {
-  bucket = "gnehal-${var.dev_prefix}-webapp-bucket"
+  bucket = aws_s3_bucket.dev.id
 
   policy = jsonencode({
     "Version": "2012-10-17",
@@ -163,8 +163,8 @@ resource "aws_s3_bucket_policy" "webapp_bucket_policy" {
           "s3:ListBucket"
         ],
         "Resource": [
-          "arn:aws:s3:::gnehal-${var.dev_prefix}-webapp-bucket",
-          "arn:aws:s3:::gnehal-${var.dev_prefix}-webapp-bucket/*"
+          "arn:aws:s3:::${aws_s3_bucket.dev.id}",
+          "arn:aws:s3:::${aws_s3_bucket.dev.id}/*"
         ]
       }
     ]
