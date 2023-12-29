@@ -61,7 +61,7 @@ resource "aws_s3_bucket_acl" "webapp_bucket" {
 
 resource "aws_s3_bucket_policy" "webapp_bucket" {
   depends_on = [
-    aws_s3_bucket_acl..webapp_bucket.id
+    aws_s3_bucket_acl.webapp_bucket.id
   ]
 
   bucket = aws_s3_bucket.webapp_bucket.id
