@@ -138,7 +138,7 @@ resource "aws_iam_instance_profile" "webapp_profile" {
 
 resource "aws_instance" "webapp_instance" {
   ami           = "ami-088ea5b4f71079f94"
-  instance_type = "t2.micro"
+  instance_type = "t2.large"
   
   iam_instance_profile = aws_iam_instance_profile.webapp_profile.name
 
