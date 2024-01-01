@@ -105,8 +105,5 @@ resource "aws_instance" "web" {
               EOF
 }
 
-output "public-ip" {
-  value = aws_eip.production-eip.public_ip
-}
 
 
