@@ -1,3 +1,3 @@
 output "public_ip" {
-  value = module.compute.public_ip
+  value = "http://${module.compute.public_ip}"
 }
