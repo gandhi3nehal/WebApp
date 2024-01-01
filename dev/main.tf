@@ -9,7 +9,7 @@ resource "aws_vpc" "production-vpc" {
 resource "aws_subnet" "production-subnet-1" {
   vpc_id     = aws_vpc.production-vpc.id
   cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1"
+  availability_zone = "us-east-1a"
 }
 
 resource "aws_internet_gateway" "production-ig" {
