@@ -1,13 +1,13 @@
 
 provider "aws" {
-  region = "us-west-2"
+  region = "${var.region}"
 }
 
 module "compute" {
   source               = "../modules/compute"
   ami                  = "ami-0d70546e43a941d70"
   instance_type        = "t2.micro"
-  tag_name             = "dev-aws-web-app"
+  tag_name             = "${var.env_prefix}-aws-web-app"
   sg                   = module.security.webserver_sg
   user_data            = file("../assets/userdata.tpl")
   iam_instance_profile = module.iam.s3_profile
@@ -29,7 +29,7 @@ module "iam" {
 }
 module "s3" {
   source        = "../modules/s3"
-  bucket_name   = "gnehal-dev-aws-web-app"
+  bucket_name   = "gnehal-${var.env_prefix}-aws-web-app"
   acl           = "private"
   object_key    = "LUIT"
   object_source = "/dev/null"
