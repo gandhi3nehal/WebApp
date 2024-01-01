@@ -13,7 +13,7 @@ module "compute" {
 }
 
 module "security" {
-  source = "./module/security"
+  source = "../modules/security"
 }
 
 module "iam" {
