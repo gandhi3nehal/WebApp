@@ -1,4 +1,3 @@
-
 provider "aws" {
   region = "${var.region}"
 }
@@ -27,6 +26,7 @@ module "iam" {
   iam_policy             = file("../assets/s3-list-bucket-policy.tpl")
   assume_role_policy     = file("../assets/s3-list-bucket-trusted-identity.tpl")
 }
+
 module "s3" {
   source        = "../modules/s3"
   bucket_name   = "gnehal-${var.env_prefix}-aws-web-app"
