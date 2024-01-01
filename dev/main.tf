@@ -1,174 +1,112 @@
-provider "aws" {
-  region = var.region
-  default_tags {
-    tags = {
-      Environment = "${var.env_prefix}"
-      Service     = "webapp"
-    }
+resource "aws_vpc" "production-vpc" {
+  cidr_block = "10.0.0.0/16"
+}
+
+resource "aws_subnet" "production-subnet-1" {
+  vpc_id     = aws_vpc.production-vpc.id
+  cidr_block = "10.0.1.0/24"
+  availability_zone = "us-east-1"
+}
+
+resource "aws_internet_gateway" "production-ig" {
+  vpc_id = aws_vpc.production-vpc.id
+}
+
+resource "aws_route_table" "production-subnet-1-route-table" {
+  vpc_id = aws_vpc.production-vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.production-ig.id
+  }
+  route {
+    ipv6_cidr_block        = "::/0"
+    gateway_id = aws_internet_gateway.production-ig.id
   }
 }
 
-resource "random_pet" "petname" {
-  length    = 3
-  separator = "-"
+resource "aws_route_table_association" "production-subnet-1-association-1" {
+  subnet_id      = aws_subnet.production-subnet-1.id
+  route_table_id = aws_route_table.production-subnet-1-route-table.id
 }
 
-resource "aws_s3_bucket" "webapp_bucket" {
-  bucket = "${var.env_prefix}-${random_pet.petname.id}"
+resource "aws_security_group" "production-security-group" {
+  name        = "allow_all"
+  description = "Allow All Traffic"
+  vpc_id      = aws_vpc.production-vpc.id
 
-  force_destroy = true
-}
-
-resource "aws_s3_bucket_website_configuration" "webapp_bucket" {
-  bucket = aws_s3_bucket.webapp_bucket.id
-
-  index_document {
-    suffix = "index.html"
+  ingress {
+    description      = "HTTPS"
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
   }
 
-  error_document {
-    key = "error.html"
+  ingress {
+    description      = "HTTP"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
   }
-}
 
-resource "aws_s3_bucket_ownership_controls" "webapp_bucket" {
-  bucket = aws_s3_bucket.webapp_bucket.id
-
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "webapp_bucket" {
-  bucket = aws_s3_bucket.webapp_bucket.id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
-resource "aws_s3_bucket_acl" "webapp_bucket" {
-  depends_on = [
-    aws_s3_bucket_ownership_controls.webapp_bucket,
-    aws_s3_bucket_public_access_block.webapp_bucket,
-  ]
-
-  bucket = aws_s3_bucket.webapp_bucket.id
-
-  acl = "public-read"
-}
-
-resource "aws_s3_bucket_policy" "webapp_bucket" {
-  depends_on = [
-    aws_s3_bucket_acl.webapp_bucket
-  ]
-
-  bucket = aws_s3_bucket.webapp_bucket.id
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": [
-                "s3:GetObject"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${aws_s3_bucket.webapp_bucket.id}/*"
-            ]
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_s3_object" "webapp_bucket" {
-  key          = "index.html"
-  bucket       = aws_s3_bucket.webapp_bucket.id
-  content      = file("../assets/index.html")
-  content_type = "text/html"
-}
-
-resource "random_pet" "table_name" {}
-
-resource "aws_dynamodb_table" "table" {
-  name = "${var.env_prefix}-${random_pet.table_name.id}"
-
-  read_capacity  = var.db_read_capacity
-  write_capacity = var.db_write_capacity
-  hash_key       = "UUID"
-
-  attribute {
-    name = "UUID"
-    type = "S"
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    # ALLOW ALL
   }
 }
 
-resource "aws_iam_role" "webapp_role" {
-  name = "${var.env_prefix}-webapp-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+resource "aws_network_interface" "production-ec2-1-NI" {
+  subnet_id       = aws_subnet.production-subnet-1.id
+  private_ips     = ["10.0.1.50"]
+  security_groups = [aws_security_group.production-security-group.id]
 }
 
-resource "aws_iam_role_policy_attachment" "webapp_attachment" {
-  role       = aws_iam_role.webapp_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+resource "aws_eip" "production-eip" {
+  vpc                       = true
+  network_interface         =  aws_network_interface.production-ec2-1-NI.id
+  associate_with_private_ip = "10.0.1.50"
 }
 
-resource "aws_iam_instance_profile" "webapp_profile" {
-  name = "${var.env_prefix}-webapp-profile"
-  role = aws_iam_role.webapp_role.name
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
 }
 
-resource "aws_instance" "webapp_instance" {
-  ami           = "ami-088ea5b4f71079f94"
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  
-  iam_instance_profile = aws_iam_instance_profile.webapp_profile.name
-
-  tags = {
-    Name = "${var.env_prefix}-webapp-instance"
+  availability_zone = "us-east-1"
+  network_interface {
+    network_interface_id = aws_network_interface.production-ec2-1-NI.id
+    device_index = 0
   }
+  user_data = <<-EOF
+              #!bin/bash
+              sudo apt update -y
+              sudo apt install nginx -y
+              sudo systemctl start nginx
+              EOF
 }
 
-resource "aws_s3_bucket_policy" "webapp_bucket_policy" {
-  bucket = aws_s3_bucket.webapp_bucket.id
-
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.webapp_role.name}"
-        },
-        "Action": [
-          "s3:GetObject",
-          "s3:ListBucket"
-        ],
-        "Resource": [
-          "arn:aws:s3:::${aws_s3_bucket.webapp_bucket.id}",
-          "arn:aws:s3:::${aws_s3_bucket.webapp_bucket.id}/*"
-        ]
-      }
-    ]
-  })
+output "public-ip" {
+  value = aws_eip.production-eip.public_ip
 }
 
-data "aws_caller_identity" "current" {}
+
