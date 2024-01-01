@@ -8,12 +8,3 @@ variable "env_prefix" {
   default  = "dev"
 }
 
-variable "db_read_capacity" {
-  type = number
-  default = 1
-}
-
-variable "db_write_capacity" {
-  type = number
-  default = 1
-}
