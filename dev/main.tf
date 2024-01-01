@@ -18,9 +18,9 @@ module "security" {
 
 module "iam" {
   source                 = "../modules/iam"
-  role_name              = "s3-list-bucket"
-  policy_name            = "s3-list-bucket"
-  instance_profile_name  = "s3-list-bucket"
+  role_name              = "${var.env_prefix}-s3-list-bucket"
+  policy_name            = "${var.env_prefix}-s3-list-bucket"
+  instance_profile_name  = "${var.env_prefix}-s3-list-bucket"
   path                   = "/"
   iam_policy_description = "s3 policy for ec2 to list role"
   iam_policy             = file("../assets/s3-list-bucket-policy.tpl")
