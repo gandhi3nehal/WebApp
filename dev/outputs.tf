@@ -1,6 +1,6 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
+#------ root/outputs
 
-output "public-ip" {
-  value = aws_eip.production-eip.public_ip
+output "public_ip" {
+  value = module.compute.public_ip
 }
+
