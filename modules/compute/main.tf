@@ -10,6 +10,6 @@ resource "aws_instance" "app_server" {
     Name = "${var.tag_name}instance"
   }
 }
-data "aws_key_pair" "oregon" {
-  key_name = "Oregon"
+data "aws_key_pair" "us-east-2-key" {
+  key_name = "us-east-2-key"
 }
