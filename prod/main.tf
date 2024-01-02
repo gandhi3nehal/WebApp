@@ -14,6 +14,7 @@ module "compute" {
 
 module "security" {
   source = "../modules/security"
+  sg_name = "${var.env_prefix}-HTTP-ALB"
 }
 
 module "iam" {
