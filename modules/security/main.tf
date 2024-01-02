@@ -1,7 +1,7 @@
 # --- modules/security/main.tf
 
 resource "aws_security_group" "webserver" {
-  name        = "HTTP Access via ALB"
+  name        = var.aws_security_group_name
   description = "Allow HTTP inbound traffic via ALB, and SSH traffic via bastion host"
 
 
