@@ -9,16 +9,16 @@ variable "env_prefix" {
 }
 
 variable "instance_type" {
-  description = "This is the environment where your webapp is deployed. qa, prod, or dev"
-  default  = "t2.micro"
+  description = "instance type"
+  default  = "t2.small"
 }
 
 variable "key_pair" {
-  description = "This is the environment where your webapp is deployed. qa, prod, or dev"
+  description = "key pair"
   default  = "us-east-1-key"
 }
 
 variable "ami" {
-  description = "This is the environment where your webapp is deployed. qa, prod, or dev"
+  description = "ami"
   default  = "ami-0005e0cfe09cc9050"
 }
