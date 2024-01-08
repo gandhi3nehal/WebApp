@@ -4,7 +4,7 @@ provider "aws" {
 
 module "compute" {
   source               = "../modules/compute"
-  ami                  = "ami-05fb0b8c1424f266b"
+  ami                  = "${var.ami}"
   instance_type        = "${var.instance_type}"
   key_pair             = "${var.key_pair}"
   tag_name             = "gnehal-aws-web-app-${var.env_prefix}"
