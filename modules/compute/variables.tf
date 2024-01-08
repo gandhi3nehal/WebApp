@@ -18,3 +18,7 @@ variable "user_data" {
 variable "iam_instance_profile" {
   description = "iam instance profile for the ec2 instance"
 }
+
+variable "key_pair" {
+  description = "instance key pair"
+}
