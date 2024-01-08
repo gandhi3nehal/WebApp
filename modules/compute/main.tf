@@ -7,7 +7,7 @@ resource "aws_instance" "app_server" {
   iam_instance_profile   = var.iam_instance_profile
   key_name               = data.aws_key_pair.key_pair.key_name
   tags = {
-    Name = "${var.tag_name}instance"
+    Name = "${var.tag_name}-instance"
   }
 }
 data "aws_key_pair" "key_pair" {
