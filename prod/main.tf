@@ -5,7 +5,7 @@ provider "aws" {
 module "compute" {
   source               = "../modules/compute"
   ami                  = "ami-05fb0b8c1424f266b"
-  instance_type        = "t2.micro"
+  instance_type        = "${var.instance_type}"
   tag_name             = "${var.env_prefix}-aws-web-app"
   sg                   = module.security.webserver_sg
   user_data            = file("../assets/userdata.tpl")
