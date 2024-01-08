@@ -7,3 +7,8 @@ variable "env_prefix" {
   description = "This is the environment where your webapp is deployed. qa, prod, or dev"
   default  = "prod"
 }
+
+variable "instance_type" {
+  description = "This is the environment where your webapp is deployed. qa, prod, or dev"
+  default  = "t2.micro"
+}
