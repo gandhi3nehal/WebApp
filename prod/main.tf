@@ -6,6 +6,7 @@ module "compute" {
   source               = "../modules/compute"
   ami                  = "ami-05fb0b8c1424f266b"
   instance_type        = "${var.instance_type}"
+  key_pair             = "${var.key_pair}"
   tag_name             = "gnehal-aws-web-app-${var.env_prefix}"
   sg                   = module.security.webserver_sg
   user_data            = file("../assets/userdata.tpl")
