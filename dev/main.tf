@@ -6,7 +6,7 @@ module "compute" {
   source               = "../modules/compute"
   ami                  = "ami-05fb0b8c1424f266b"
   instance_type        = "${var.instance_type}"
-  tag_name             = "${var.env_prefix}-aws-web-app"
+  tag_name             = "aws-web-app-${var.env_prefix}"
   sg                   = module.security.webserver_sg
   user_data            = file("../assets/userdata.tpl")
   iam_instance_profile = module.iam.s3_profile
@@ -14,14 +14,14 @@ module "compute" {
 
 module "security" {
   source = "../modules/security"
-  sg_name = "${var.env_prefix}-HTTP-ALB"
+  sg_name = "gnehal-aws-web-app-${var.env_prefix}-HTTP-ALB"
 }
 
 module "iam" {
   source                 = "../modules/iam"
-  role_name              = "${var.env_prefix}-s3-list-bucket"
-  policy_name            = "${var.env_prefix}-s3-list-bucket"
-  instance_profile_name  = "${var.env_prefix}-s3-list-bucket"
+  role_name              = "gnehal-aws-web-app-${var.env_prefix}-s3-list-bucket"
+  policy_name            = "gnehal-aws-web-app-${var.env_prefix}-s3-list-bucket"
+  instance_profile_name  = "gnehal-aws-web-app-${var.env_prefix}-s3-list-bucket"
   path                   = "/"
   iam_policy_description = "s3 policy for ec2 to list role"
   iam_policy             = file("../assets/s3-list-bucket-policy.tpl")
@@ -30,7 +30,7 @@ module "iam" {
 
 module "s3" {
   source        = "../modules/s3"
-  bucket_name   = "gnehal-${var.env_prefix}-aws-web-app"
+  bucket_name   = "gnehal-aws-web-app-${var.env_prefix}"
   acl           = "private"
   object_key    = "LUIT"
   object_source = "/dev/null"
