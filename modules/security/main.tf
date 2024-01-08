@@ -2,7 +2,7 @@
 
 resource "aws_security_group" "webserver" {
   name        = var.sg_name
-  description = "Allow HTTP inbound traffic via ALB, and SSH traffic via bastion host"
+  description = "Allow HTTP inbound traffic and SSH traffic"
 
 
   ingress {
