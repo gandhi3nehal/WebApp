@@ -5,11 +5,11 @@ resource "aws_instance" "app_server" {
   vpc_security_group_ids = [var.sg]
   user_data              = var.user_data
   iam_instance_profile   = var.iam_instance_profile
-  key_name               = data.aws_key_pair.us-east-2-key.key_name
+  key_name               = data.aws_key_pair.key_pair.key_name
   tags = {
     Name = "${var.tag_name}instance"
   }
 }
-data "aws_key_pair" "us-east-2-key" {
-  key_name = "us-east-2-key"
+data "aws_key_pair" "key_pair" {
+  key_name = var.key_pair
 }
