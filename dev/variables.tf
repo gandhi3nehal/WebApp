@@ -17,3 +17,9 @@ variable "key_pair" {
   description = "This is the environment where your webapp is deployed. qa, prod, or dev"
   default  = "us-east-2-key"
 }
+
+
+variable "ami" {
+  description = "This is the environment where your webapp is deployed. qa, prod, or dev"
+  default  = "ami-05fb0b8c1424f266b"
+}
