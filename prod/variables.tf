@@ -10,7 +10,7 @@ variable "env_prefix" {
 
 variable "instance_type" {
   description = "This is the environment where your webapp is deployed. qa, prod, or dev"
-  default  = "t2.medium"
+  default  = "t2.micro"
 }
 
 variable "key_pair" {
