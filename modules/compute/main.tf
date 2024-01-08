@@ -11,5 +11,5 @@ resource "aws_instance" "app_server" {
   }
 }
 data "aws_key_pair" "key_pair" {
-  key_name = var.key_pair
+  key_name = "${var.key_pair}"
 }
