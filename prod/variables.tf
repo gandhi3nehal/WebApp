@@ -20,5 +20,5 @@ variable "key_pair" {
 
 variable "ami" {
   description = "ami"
-  default  = "ami-0005e0cfe09cc9050"
+  default  = "ami-0c7217cdde317cfec"
 }
